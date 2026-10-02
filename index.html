@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Speak With Me — Full Voice Coach</title>
+<title>Speak With Me — Auto-Listening Coach</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
 <script>
@@ -21,13 +21,18 @@ tailwind.config = {
 <header class="bg-white shadow-sm sticky top-0 z-50">
   <div class="max-w-lg mx-auto px-4 py-3 flex items-center justify-between">
     <h1 class="text-xl font-bold text-primary flex items-center gap-2">
-      <i class="fa-solid fa-microphone-lines"></i> Your Voice Coach
+      <i class="fa-solid fa-microphone-lines"></i> Auto-Listening Coach
     </h1>
     <span id="dayBadge" class="bg-secondary/10 text-secondary px-3 py-1 rounded-full text-sm font-medium">Day 1</span>
   </div>
 </header>
 
 <main class="max-w-lg mx-auto px-4 py-4">
+  <!-- Status Bar -->
+  <div id="globalStatus" class="mb-4 p-3 rounded-xl bg-slate-100 text-center text-sm font-medium">
+    <span id="statusText">🔇 Tap "Start Listening" once — then just speak anytime!</span>
+  </div>
+
   <!-- Tabs -->
   <div class="flex gap-2 mb-5">
     <button data-tab="coach" class="tab-btn active flex-1 py-2.5 px-3 rounded-lg font-medium bg-primary text-white">
@@ -41,35 +46,39 @@ tailwind.config = {
     </button>
   </div>
 
-  <!-- ============= AI COACH TAB — SPOKEN GUIDANCE ============= -->
+  <!-- ============= AI COACH TAB — AUTO-LISTENING ============= -->
   <section id="coach-panel" class="tab-panel">
     <div class="bg-white rounded-2xl shadow-sm p-5 mb-4">
-      <h2 class="text-lg font-semibold mb-3">🎙️ Talk Through Your Practice</h2>
-      <div id="chatBox" class="bg-slate-50 rounded-xl p-4 h-[340px] overflow-y-auto mb-4 border">
+      <h2 class="text-lg font-semibold mb-3">🎙️ Hands-Free Practice</h2>
+      
+      <!-- Main Control Button -->
+      <button id="autoListenBtn" class="w-full py-4 rounded-full bg-success text-white font-bold text-lg mb-4 hover:bg-success/90 transition-all">
+        <span id="listenIcon">🔇</span> <span id="listenLabel">Start Auto-Listening</span>
+      </button>
+      
+      <!-- Chat Area -->
+      <div id="chatBox" class="bg-slate-50 rounded-xl p-4 h-[320px] overflow-y-auto mb-4 border">
         <div class="bg-blue-50 text-blue-800 rounded-xl p-3 mb-4 text-center">
-          <i class="fa-solid fa-robot mr-2"></i> Hello! I'm your speaking coach. I'll guide you through EVERYTHING — breathing, pauses, pronunciation, exercises. Just listen and follow along! Tap the mic when I ask you to speak. 🎤
+          <i class="fa-solid fa-robot mr-2"></i> Hello! Tap the green button ONCE above. Then just SPEAK — no more tapping! I'll hear you automatically! 🎤✨
         </div>
       </div>
-      <p id="status" class="text-center text-slate-500 text-sm mb-3 min-h-[24px]">Ready — tap below to start 🎤</p>
-      <button id="micBtn" class="w-full py-4 rounded-full bg-primary text-white font-bold text-lg hover:bg-primary/90 transition-all">
-        <span id="micIcon">🎤</span> <span id="micLabel">Tap to Speak / Answer</span>
-      </button>
-      <div class="grid grid-cols-2 gap-3 mt-4">
-        <button id="startSessionBtn" class="py-3 px-4 rounded-lg bg-success text-white font-medium hover:bg-success/90">
+
+      <div class="grid grid-cols-2 gap-3">
+        <button id="startSessionBtn" class="py-3 px-4 rounded-lg bg-primary text-white font-medium hover:bg-primary/90">
           <i class="fa-solid fa-play"></i> Start Full Session
         </button>
         <button id="repeatBtn" class="py-3 px-4 rounded-lg bg-slate-100 hover:bg-slate-200">
-          <i class="fa-solid fa-volume-high"></i> Repeat Me
+          <i class="fa-solid fa-volume-high"></i> Repeat Last
         </button>
       </div>
     </div>
 
     <!-- Session Progress -->
     <div class="bg-white rounded-2xl shadow-sm p-5">
-      <h3 class="font-semibold mb-3">📋 Your Session</h3>
+      <h3 class="font-semibold mb-3">📋 Your Progress</h3>
       <div class="space-y-2 text-sm">
         <label class="flex items-center gap-2"><input type="checkbox" id="step-breath"> Breathing & Posture</label>
-        <label class="flex items-center gap-2"><input type="checkbox" id="step-pauses"> Pauses: Short & Long</label>
+        <label class="flex items-center gap-2"><input type="checkbox" id="step-pauses"> Short & Long Pauses</label>
         <label class="flex items-center gap-2"><input type="checkbox" id="step-sounds"> Sound Drills</label>
         <label class="flex items-center gap-2"><input type="checkbox" id="step-word"> Today's Word</label>
         <label class="flex items-center gap-2"><input type="checkbox" id="step-sentence"> Sentence Practice</label>
@@ -87,52 +96,30 @@ tailwind.config = {
           <li><strong>Posture:</strong> Feet flat, shoulders relaxed, chin level. Stand or sit tall — not stiff.</li>
           <li><strong>Diaphragm Breath:</strong> Hand on belly → breathe in through nose → belly expands, shoulders still. Out slowly through pursed lips like blowing out a candle.</li>
           <li><strong>Pattern:</strong> In 4 counts → Hold 2 → Out 6–8 counts. Calm, steady, silent breath in.</li>
-          <li><strong>Warm-up:</strong> Deep breath in → steady "Aaaaaah" as long and smooth as you can.</li>
         </ul>
       </div>
-
       <div>
         <h3 class="font-bold text-lg mb-3 text-secondary"><i class="fa-solid fa-pause mr-2"></i> Pausing — Your Secret Weapon</h3>
         <div class="space-y-3 text-sm">
           <div class="border-l-4 border-green-400 pl-3 py-1">
             <p class="font-semibold text-green-700">⏸️ Short Pause — 1 beat</p>
-            <p>Between phrases / ideas. <em>Silence = comma in writing.</em></p>
-            <p class="mt-1">Example: "I want to speak clearly <span class="pause-short">⏸</span> and confidently."</p>
+            <p>Between phrases. Like a comma.</p>
+            <p class="mt-1">"I want to speak clearly <span class="pause-short">⏸</span> and confidently."</p>
           </div>
           <div class="border-l-4 border-red-400 pl-3 py-1">
             <p class="font-semibold text-red-700">⏹️ Long Pause — 2–3 beats</p>
-            <p>Between sentences / before key words. <em>Silence = period or new thought.</em></p>
-            <p class="mt-1">Example: "Practice every day <span class="pause-long">⏹</span> You WILL improve."</p>
+            <p>Between sentences / before key words. Like a period.</p>
+            <p class="mt-1">"Practice every day <span class="pause-long">⏹</span> You WILL improve."</p>
           </div>
-          <p class="font-medium mt-2">💡 Rule: Pause BEFORE the important word — not after. Let the silence build attention.</p>
         </div>
       </div>
-
       <div>
         <h3 class="font-bold text-lg mb-3 text-accent"><i class="fa-solid fa-ear-listen mr-2"></i> Pronunciation Guide</h3>
         <ul class="space-y-2 text-sm">
-          <li><strong>Stress = louder & longer:</strong> <span class="stress">TIK</span> in ar-TIK-yuh-layt. Only 1 main stress per word.</li>
-          <li><strong>TH sounds:</strong> Tongue tip lightly touching top teeth. <em>Think — tongue between teeth, not behind them!</em></li>
-          <li><strong>R vs L:</strong> R = lips round, tongue pulled back. L = tongue tip touches roof of mouth behind front teeth.</li>
-          <li><strong>Endings matter:</strong> Don't drop final sounds — make every letter count without rushing.</li>
+          <li><strong>Stress = louder & longer:</strong> ar-<span class="stress">TIK</span>-yuh-layt — only ONE main stress per word.</li>
+          <li><strong>TH:</strong> Tongue tip lightly touches top teeth. Not behind them!</li>
+          <li><strong>Endings:</strong> Don't drop final sounds — make every letter count.</li>
         </ul>
-      </div>
-
-      <div>
-        <h3 class="font-bold text-lg mb-3 text-success"><i class="fa-solid fa-dumbbell mr-2"></i> Daily Sound Drills</h3>
-        <div class="space-y-3 text-sm">
-          <div>
-            <p class="font-semibold">Set A — Plosives & Clear Sounds</p>
-            <p>Pa-pa-pa / Ba-ba-ba / Ta-ta-ta / Da-da-da — crisp, sharp, separate ×10 each</p>
-            <p>See-she / sip-ship — keep S and SH distinct ×10</p>
-          </div>
-          <div>
-            <p class="font-semibold">Set B — Tricky Sounds</p>
-            <p>Red-led-wed — no blurring ×12</p>
-            <p>Three / thank / think — tongue forward ×8</p>
-            <p>That / this / those — soft TH, gentle ×8</p>
-          </div>
-        </div>
       </div>
     </div>
   </section>
@@ -141,7 +128,7 @@ tailwind.config = {
   <section id="words-panel" class="tab-panel hidden">
     <div class="bg-white rounded-2xl shadow-sm p-5">
       <h2 class="text-lg font-semibold mb-2">📚 28-Day Word Library</h2>
-      <p class="text-sm text-slate-500 mb-4">Tap 🔊 to hear, practice with pauses included</p>
+      <p class="text-sm text-slate-500 mb-4">Tap 🔊 to hear, practice with pauses</p>
       <div id="libraryList" class="space-y-3 max-h-[650px] overflow-y-auto"></div>
     </div>
   </section>
@@ -149,7 +136,7 @@ tailwind.config = {
 
 <script>
 // ==============================================
-// FULL DATABASE
+// FULL 28-DAY DATA
 // ==============================================
 const PLAN = [
   {day:1,week:1,dayName:'Monday',word:'articulate',pron:'ar-<span class="stress">TIK</span>-yuh-layt',speak:'ar TIK yuh layt',meaning:'Express thoughts clearly and effectively',sentence:'I want to articulate my ideas <span class="pause-short">⏸</span> so people understand me perfectly <span class="pause-long">⏹</span>'},
@@ -163,9 +150,9 @@ const PLAN = [
   {day:9,week:2,dayName:'Tuesday',word:'clarity',pron:'<span class="stress">KLAR</span>-uh-tee',speak:'KLAR uh tee',meaning:'How easy your speech is to understand',sentence:'Clarity comes from slowing down <span class="pause-short">⏸</span> and pausing <span class="pause-long">⏹</span>'},
   {day:10,week:2,dayName:'Wednesday',word:'emphasis',pron:'<span class="stress">EM</span>-fuh-sis',speak:'EM fuh sis',meaning:'Stressing important words',sentence:'Put emphasis on the key word <span class="pause-short">⏸</span> not every word <span class="pause-long">⏹</span>'},
   {day:11,week:2,dayName:'Thursday',word:'enunciate',pron:'ih-<span class="stress">NUN</span>-see-ayt',speak:'ih NUN see ayt',meaning:'Pronounce every part clearly',sentence:'Enunciate each syllable <span class="pause-short">⏸</span> open your mouth <span class="pause-long">⏹</span>'},
-  {day:12,week:2,dayName:'Friday',word:'fluent',pron:'<span class="stress">FLOO</span>-ent',speak:'FLOO ent',meaning:'Smooth, natural flow without stopping',sentence:'Fluent speech is not fast <span class="pause-short">⏸</span> it is steady <span class="pause-long">⏹</span>'},
+  {day:12,week:2,dayName:'Friday',word:'fluent',pron:'<span class="stress">FLOO</span>-ent',speak:'FLOO ent',meaning:'Smooth, natural flow',sentence:'Fluent speech is not fast <span class="pause-short">⏸</span> it is steady <span class="pause-long">⏹</span>'},
   {day:13,week:2,dayName:'Saturday',word:'precision',pron:'pri-<span class="stress">SIZ</span>-shun',speak:'pri SIZ shun',meaning:'Exact, careful pronunciation',sentence:'Precision means caring about every sound <span class="pause-short">⏸</span> not rushing <span class="pause-long">⏹</span>'},
-  {day:14,week:2,dayName:'Sunday',word:'rhythm',pron:'<span class="stress">RITH</span>-um',speak:'RITH um',meaning:'Natural pace and pauses in speech',sentence:'Find your natural rhythm <span class="pause-short">⏸</span> speak like music <span class="pause-long">⏹</span>'},
+  {day:14,week:2,dayName:'Sunday',word:'rhythm',pron:'<span class="stress">RITH</span>-um',speak:'RITH um',meaning:'Natural pace and pauses',sentence:'Find your natural rhythm <span class="pause-short">⏸</span> speak like music <span class="pause-long">⏹</span>'},
   {day:15,week:3,dayName:'Monday',word:'authentic',pron:'aw-<span class="stress">THEN</span>-tik',speak:'aw THEN tik',meaning:'True to your natural voice',sentence:'Be authentic <span class="pause-short">⏸</span> your real voice is your best voice <span class="pause-long">⏹</span>'},
   {day:16,week:3,dayName:'Tuesday',word:'command',pron:'kuh-<span class="stress">MAND</span>',speak:'kuh MAND',meaning:'Speak with authority and presence',sentence:'Command the room <span class="pause-short">⏸</span> stand tall <span class="pause-long">⏹</span>'},
   {day:17,week:3,dayName:'Wednesday',word:'convey',pron:'kun-<span class="stress">VEY</span>',speak:'kun VEY',meaning:'Carry your meaning across clearly',sentence:'Your words convey your thoughts <span class="pause-short">⏸</span> choose them well <span class="pause-long">⏹</span>'},
@@ -194,7 +181,7 @@ function getDayIndex() {
 const TODAY = PLAN[getDayIndex()];
 
 // ==============================================
-// TEXT-TO-SPEECH — COACH'S VOICE
+// TEXT-TO-SPEECH
 // ==============================================
 function speak(text, callback) {
   window.speechSynthesis.cancel();
@@ -204,61 +191,118 @@ function speak(text, callback) {
   window.speechSynthesis.speak(u);
 }
 
-function addSpoken(text, speaker='coach') {
+function addMsg(text, who='bot') {
   const box = document.getElementById('chatBox');
   const d = document.createElement('div');
   d.className = `mb-3 max-w-[90%] p-3 rounded-xl ${
-    speaker==='user'?'bg-primary text-white ml-auto rounded-br-sm':'bg-blue-50 text-blue-800 mr-auto rounded-bl-sm'
+    who==='user'?'bg-primary text-white ml-auto rounded-br-sm':'bg-blue-50 text-blue-800 mr-auto rounded-bl-sm'
   }`;
   d.innerHTML = text;
   box.appendChild(d); box.scrollTop = box.scrollHeight;
 }
 
-function setStatus(t) { document.getElementById('status').textContent = t; }
-function updateMic(listening) {
-  const btn = document.getElementById('micBtn'), icon = document.getElementById('micIcon'), label = document.getElementById('micLabel');
-  if (listening) { btn.classList.add('bg-danger','animate-pulse'); btn.classList.remove('bg-primary'); icon.textContent='🔴'; label.textContent='Listening...'; }
-  else { btn.classList.remove('bg-danger','animate-pulse'); btn.classList.add('bg-primary'); icon.textContent='🎤'; label.textContent='Tap to Speak'; }
+function updateStatus(text, listening) {
+  const bar = document.getElementById('globalStatus');
+  const textEl = document.getElementById('statusText');
+  textEl.textContent = text;
+  bar.className = `mb-4 p-3 rounded-xl text-center text-sm font-medium ${
+    listening ? 'bg-green-100 text-green-800' : 'bg-slate-100'
+  }`;
+}
+
+function updateListenButton(active) {
+  const btn = document.getElementById('autoListenBtn');
+  const icon = document.getElementById('listenIcon');
+  const label = document.getElementById('listenLabel');
+  if (active) {
+    btn.classList.add('bg-danger','animate-pulse'); btn.classList.remove('bg-success');
+    icon.textContent = '🎙️'; label.textContent = 'Auto-Listening ON — Speak Anytime!';
+  } else {
+    btn.classList.remove('bg-danger','animate-pulse'); btn.classList.add('bg-success');
+    icon.textContent = '🔇'; label.textContent = 'Start Auto-Listening';
+  }
 }
 
 // ==============================================
-// SPEECH RECOGNITION — LISTEN TO USER
+// AUTO-LISTENING SPEECH RECOGNITION
 // ==============================================
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-let recognition = null, isListening = false;
+let recognition = null;
+let isAutoListening = false;
+let shouldRestart = true; // keeps it looping automatically
 
 if (SpeechRecognition) {
   recognition = new SpeechRecognition();
-  recognition.lang = 'en-US'; recognition.interimResults = true; recognition.continuous = false;
-  recognition.onstart = () => { isListening = true; updateMic(true); setStatus("🎙️ I'm listening — speak now!"); };
-  recognition.onresult = (e) => {
-    const t = Array.from(e.results).map(r=>r[0].transcript).join('');
-    if (e.results[0].isFinal) { addSpoken(t, 'user'); handleUserInput(t.toLowerCase().trim()); }
+  recognition.lang = 'en-US';
+  recognition.continuous = true; // KEEP LISTENING AFTER EACH UTTERANCE
+  recognition.interimResults = true; // SHOW WORDS AS YOU SPEAK
+
+  recognition.onstart = () => {
+    isAutoListening = true;
+    updateListenButton(true);
+    updateStatus("🎙️ Listening — speak now! No button needed!", true);
   };
-  recognition.onend = () => { isListening = false; updateMic(false); setStatus("Ready — tap when you're ready 🎤"); };
+
+  recognition.onresult = (e) => {
+    let finalTranscript = '';
+    for (let i = e.resultIndex; i < e.results.length; i++) {
+      if (e.results[i].isFinal) {
+        finalTranscript += e.results[i][0].transcript;
+      }
+    }
+    if (finalTranscript.trim()) {
+      addMsg(finalTranscript.trim(), 'user');
+      handleInput(finalTranscript.trim().toLowerCase());
+    }
+  };
+
+  recognition.onend = () => {
+    // AUTO-RESTART listening when it stops — THIS IS THE MAGIC! ✨
+    if (shouldRestart && isAutoListening) {
+      setTimeout(() => {
+        try { recognition.start(); } catch(e) {}
+      }, 150);
+    } else {
+      isAutoListening = false;
+      updateListenButton(false);
+      updateStatus("🔇 Auto-listening stopped — tap to start again", false);
+    }
+  };
+
   recognition.onerror = (e) => {
-    isListening = false; updateMic(false);
-    setStatus(e.error==='not-allowed'?"⚠️ Allow microphone in site settings — refresh & try again":"Try again — speak clearly please");
+    if (e.error === 'not-allowed') {
+      updateStatus("⚠️ Allow microphone access — refresh & tap again", false);
+      shouldRestart = false;
+    }
+    // Auto-restart on other errors
+    if (shouldRestart && isAutoListening) {
+      setTimeout(() => { try { recognition.start(); } catch(err) {} }, 300);
+    }
   };
 } else {
-  setStatus("❌ Use Chrome or Safari on phone/laptop");
-  document.getElementById('micBtn').classList.add('opacity-50','cursor-not-allowed');
+  updateStatus("❌ Use Chrome or Safari on phone/laptop", false);
+  document.getElementById('autoListenBtn').classList.add('opacity-50','cursor-not-allowed');
 }
 
+// Toggle auto-listening
+document.getElementById('autoListenBtn').onclick = () => {
+  if (!recognition) return;
+  if (isAutoListening) {
+    shouldRestart = false;
+    recognition.stop();
+    isAutoListening = false;
+    updateListenButton(false);
+    updateStatus("🔇 Auto-listening stopped — tap to start again", false);
+  } else {
+    shouldRestart = true;
+    recognition.start();
+  }
+};
+
 // ==============================================
-// SESSION STATE MACHINE — FULL FLOW
+// SESSION FLOW & RESPONSES
 // ==============================================
 let sessionStep = 0;
-const STEPS = [
-  {id:'intro', label:'Welcome'},
-  {id:'breath', label:'Breathing'},
-  {id:'pauses', label:'Pauses Guide'},
-  {id:'sounds', label:'Sound Drills'},
-  {id:'word', label:'Today\'s Word'},
-  {id:'sentence', label:'Sentence & Pauses'},
-  {id:'convo', label:'Conversation'},
-  {id:'done', label:'Complete'}
-];
 
 function startFullSession() {
   sessionStep = 0;
@@ -269,95 +313,78 @@ function startFullSession() {
 function advanceStep(userText='') {
   sessionStep++;
   switch(sessionStep) {
-    case 1: // BREATHING
-      addSpoken(`Great! Let's start with the foundation — your breathing. 🫁<br><br>Put one hand on your belly. Stand or sit up tall, shoulders relaxed. Breathe in slowly through your nose for 4 counts… feel your belly expand. Not your chest. Then breathe out slowly through pursed lips, like you're blowing out a candle. Out… slow… steady…<br><br>Let's do that together. In… 2… 3… 4… Hold… 2… Now out… 2… 3… 4… 5… 6…<br><br>How did that feel? Did your belly move? Tell me.`);
+    case 1:
+      addMsg(`Let's start with breathing! 🫁<br><br>Hand on your belly. Breathe in through your nose… 2… 3… 4… Feel it expand. Out slowly like blowing out a candle… 2… 3… 4… 5… 6…<br><br>How did that feel? Just speak and tell me!`);
       document.getElementById('step-breath').checked = true;
-      speak(`Great! Let's start with the foundation — your breathing. Put one hand on your belly. Stand or sit up tall, shoulders relaxed. Breathe in slowly through your nose for 4 counts. Feel your belly expand. Not your chest. Then breathe out slowly through pursed lips, like you are blowing out a candle. Slow, steady. Let's do that together. In… two… three… four. Hold… two. Now out… two… three… four… five… six. How did that feel? Did your belly move? Tell me.`);
+      speak(`Let's start with breathing. Hand on your belly. Breathe in through your nose… two… three… four. Feel it expand. Out slowly like blowing out a candle… two… three… four… five… six. How did that feel? Just speak and tell me!`);
       break;
-
-    case 2: // PAUSES
-      addSpoken(`Perfect! Now — pauses. This is the secret to sounding confident and clear. ⏸️<br><br>There are TWO kinds:<br><br>⏸️ <strong>Short Pause</strong> — one beat. Between phrases. Where you'd put a comma. Stop for just a heartbeat, then continue.<br><br>⏹️ <strong>Long Pause</strong> — two to three beats. Between sentences. Before your most important word. Let the silence do the work.<br><br>Listen to this sentence:<br><br>"I speak clearly <span class="pause-short">⏸</span> and confidently <span class="pause-long">⏹</span> every single day."<br><br>Hear the difference? The short pause separates ideas. The long pause gives weight to what follows.<br><br>Ready to try? Say it after me.`);
+    case 2:
+      addMsg(`Perfect! Now pauses — your secret weapon ⏸️<br><br>⏸️ <strong>Short Pause</strong> = 1 beat — between phrases, like a comma.<br>⏹️ <strong>Long Pause</strong> = 2–3 beats — between sentences, before your most important word.<br><br>Try this: "I speak clearly <span class="pause-short">⏸</span> and confidently <span class="pause-long">⏹</span> every day."<br><br>Go ahead — speak it aloud!`);
       document.getElementById('step-pauses').checked = true;
-      speak(`Perfect! Now — pauses. This is the secret to sounding confident and clear. There are two kinds. Short pause — one beat. Between phrases. Where you would put a comma. Stop for just a heartbeat, then continue. Long pause — two to three beats. Between sentences. Before your most important word. Let the silence do the work. Listen to this sentence. I speak clearly… and confidently… every single day. Hear the difference? Ready to try? Say it after me.`);
+      speak(`Perfect! Now pauses — your secret weapon. Short pause = one beat, between phrases. Long pause = two to three beats, between sentences. Try this: I speak clearly… and confidently… every day. Go ahead — speak it aloud!`);
       break;
-
-    case 3: // SOUND DRILLS
-      addSpoken(`Excellent! Now let's wake up your mouth. 🗣️<br><br>We'll do Set A today — tomorrow Set B.<br><br>Pa-pa-pa-pa-pa — ×5. Sharp, separate sounds.<br>Ba-ba-ba-ba-ba — ×5. Strong but gentle.<br>Ta-ta-ta-ta-ta — ×5. Tongue tip touches the top.<br>Da-da-da-da-da — ×5. Same position, voiced.<br><br>Take your time. Don't rush. Each sound clear. Go ahead — do them aloud!`);
+    case 3:
+      addMsg(`Great! Now sound drills 🗣️<br><br>Pa-pa-pa-pa-pa ×5 — sharp & separate<br>Ba-ba-ba-ba-ba ×5 — strong & clear<br>Ta-ta-ta-ta-ta ×5 — tongue tip up<br>Da-da-da-da-da ×5 — same position<br><br>Take your time — do them aloud now!`);
       document.getElementById('step-sounds').checked = true;
-      speak(`Excellent! Now let's wake up your mouth. We will do Set A today. Pa-pa-pa-pa-pa. Five times. Sharp, separate sounds. Ba-ba-ba-ba-ba. Five times. Strong but gentle. Ta-ta-ta-ta-ta. Five times. Tongue tip touches the top. Da-da-da-da-da. Five times. Same position, voiced. Take your time. Don't rush. Each sound clear. Go ahead — do them aloud!`);
+      speak(`Great! Now sound drills. Pa-pa-pa-pa-pa — five times. Sharp and separate. Ba-ba-ba-ba-ba — five times. Strong and clear. Ta-ta-ta-ta-ta — five times. Tongue tip up. Da-da-da-da-da — five times. Same position. Take your time — do them aloud now!`);
       break;
-
-    case 4: // TODAY'S WORD
-      addSpoken(`Great work! 🌟 Now — your word for today is: <strong>${TODAY.word}</strong><br><br>Pronunciation: ${TODAY.pron}<br>Stress the loudest part: <span class="stress">BOLD</span> — that's where your voice goes up and stays longer.<br><br>Meaning: ${TODAY.meaning}<br><br>First — say it slow: "${TODAY.speak}"<br>Then at normal speed: ${TODAY.word}<br>Then with feeling! I'm listening — go ahead!`);
+    case 4:
+      addMsg(`Awesome! Today's word is <strong>${TODAY.word}</strong><br><br>Pronunciation: ${TODAY.pron}<br>Meaning: ${TODAY.meaning}<br><br>First slow: "${TODAY.speak}"<br>Then normal speed: ${TODAY.word}<br>Then in your own sentence! I'm listening — speak away!`);
       document.getElementById('step-word').checked = true;
-      speak(`Great work! Now — your word for today is: ${TODAY.word}. Stress the loudest part — that is where your voice goes up and stays longer. Meaning: ${TODAY.meaning}. First — say it slow: ${TODAY.speak}. Then at normal speed: ${TODAY.word}. Then with feeling! I am listening — go ahead!`);
+      speak(`Awesome! Today's word is ${TODAY.word}. Meaning: ${TODAY.meaning}. First slow: ${TODAY.speak}. Then normal speed: ${TODAY.word}. Then in your own sentence! I'm listening — speak away!`);
       break;
-
-    case 5: // SENTENCE WITH PAUSES
-      addSpoken(`Perfect! Now the full sentence — with pauses built in: ⏸️⏹️<br><br><strong>${TODAY.sentence.replace(/[⏸⏹]/g,'')}</strong><br><br>Here's where to pause:<br>→ Short pause after the first part <span class="pause-short">⏸</span><br>→ Long pause before the finish <span class="pause-long">⏹</span><br><br>Listen to me say it naturally…`);
+    case 5:
+      addMsg(`Perfect! Now the full sentence with pauses built in ⏸️<br><br>"${TODAY.sentence.replace(/[⏸⏹]/g,'…')}"<br><br>Listen to me say it…`);
       document.getElementById('step-sentence').checked = true;
       setTimeout(() => speak(TODAY.sentence.replace(/[⏸⏹]/g,', ')), 600);
       setTimeout(() => {
-        addSpoken(`Now YOU try it. Take your time. Breathe. Pause. I'm ready! 🎤`);
-        speak(`Now YOU try it. Take your time. Breathe. Pause. I am ready!`);
+        addMsg(`Now YOU try it — take your time, breathe, pause. Speak when ready! 🎤`);
+        speak(`Now YOU try it — take your time, breathe, pause. Speak when ready!`);
       }, 4000);
       break;
-
-    case 6: // CONVERSATION
-      addSpoken(`You're doing amazing! 💛 Now let's really talk.<br><br>Question 1: What is ONE thing you want to speak more clearly about?<br><br>Question 2: How will you feel when people understand you perfectly?<br><br>Question 3: When will you practice tomorrow?<br><br>Answer any or all — speak from your heart. I'm all ears! 👂`);
+    case 6:
+      addMsg(`You're doing amazing! 💛 Now real conversation — just speak your answers:<br><br>1. What's ONE thing you want to speak more clearly about?<br>2. How will you feel when people understand you perfectly?<br>3. When will you practice tomorrow?`);
       document.getElementById('step-convo').checked = true;
-      speak(`You are doing amazing. Now let's really talk. Question one: What is one thing you want to speak more clearly about? Question two: How will you feel when people understand you perfectly? Question three: When will you practice tomorrow? Answer any or all — speak from your heart. I am all ears!`);
+      speak(`You are doing amazing. Now real conversation — just speak your answers. One: What is one thing you want to speak more clearly about? Two: How will you feel when people understand you perfectly? Three: When will you practice tomorrow?`);
       break;
-
-    case 7: // FINISH
-      addSpoken(`🎉 <strong>SESSION COMPLETE!</strong><br><br>You did it! We covered breathing, pauses, pronunciation, drills, your word, and real conversation. Be proud — most people never show up like this.<br><br>Come back tomorrow same time? Your next word is ready and waiting. You've got this! 💪✨`);
-      speak(`Session complete! You did it. We covered breathing, pauses, pronunciation, drills, your word, and real conversation. Be proud — most people never show up like this. Come back tomorrow same time? Your next word is ready and waiting. You have got this!`);
-      sessionStep = 0; // reset for next time
+    case 7:
+      addMsg(`🎉 <strong>SESSION COMPLETE!</strong><br><br>You did it — breathing, pauses, pronunciation, drills, word, conversation — ALL of it! Be so proud. Come back tomorrow — your next word is waiting! 💪✨`);
+      speak(`Session complete! You did it — breathing, pauses, pronunciation, drills, word, conversation — all of it! Be so proud. Come back tomorrow — your next word is waiting!`);
+      sessionStep = 0;
       break;
   }
 }
 
-function handleUserInput(text) {
+function handleInput(text) {
   const w = TODAY.word;
   const used = text.includes(w.toLowerCase());
 
-  if (text.includes('start')) { startFullSession(); return; }
-  if (sessionStep === 1) { // breath
-    if (/good|great|yes|belly|moved|felt/.test(text)) {
-      addSpoken(`That's exactly right! ✅ Your breath is your power source. Keep that connection — it will steady your voice and give it warmth. Ready for pauses? Just say "yes" or "next"!`);
-      speak(`That is exactly right! Your breath is your power source. Keep that connection — it will steady your voice and give it warmth. Ready for pauses? Just say yes or next!`);
-    } else {
-      addSpoken(`No worries — let's try again. Hand on your belly. Breathe in… feel it push your hand out. Out… let it fall. That's it! How does that feel now?`);
-      speak(`No worries — let's try again. Hand on your belly. Breathe in… feel it push your hand out. Out… let it fall. That is it! How does that feel now?`);
-    }
+  if (/start|begin/.test(text)) { startFullSession(); return; }
+  if (/next|yes|okay|ok|sure|ready/.test(text)) {
+    addMsg(`Perfect! Moving on! ✨`);
+    speak(`Perfect! Moving on!`);
+    setTimeout(() => advanceStep(), 600);
+    return;
   }
-  else if (sessionStep >= 2 && sessionStep <= 6) {
-    if (/next|yes|ready|ok|okay|sure/.test(text)) {
-      addSpoken(`Perfect! Moving right along… ✨`);
-      speak(`Perfect! Moving right along…`);
-      setTimeout(() => advanceStep(), 800);
-    }
-    else if (used) {
-      addSpoken(`✨ <strong>SPOT ON!</strong> You used "${w}" beautifully — and I heard you pausing too! That's exactly how it sounds confident. 🌟 Keep going — want to try the next part?`);
-      speak(`Spot on! You used "${w}" beautifully — and I heard you pausing too! That is exactly how it sounds confident. Keep going — want to try the next part?`);
-    }
-    else if (/thank|thanks/.test(text)) {
-      addSpoken(`You are so welcome! 🥰 I love watching you improve. Every single practice counts. Shall we keep going?`);
-      speak(`You are so welcome! I love watching you improve. Every single practice counts. Shall we keep going?`);
-    }
-    else if (/done|finished|good|great|try|tried/.test(text)) {
-      addSpoken(`I heard you loud and clear! 👏 That was excellent. Ready for the next step?`);
-      speak(`I heard you loud and clear! That was excellent. Ready for the next step?`);
-      setTimeout(() => advanceStep(), 800);
-    }
-    else if (/bye|goodbye/.test(text)) {
-      addSpoken(`See you soon! 👋 Great work today. Come back fresh — I'll be right here waiting! 💛`);
-      speak(`See you soon! Great work today. Come back fresh — I will be right here waiting!`);
-    }
-    else {
-      addSpoken(`I hear you! 💬 Tell me more — or just say "next" to keep going!`);
-      speak(`I hear you! Tell me more — or just say next to keep going!`);
-    }
+  if (used) {
+    addMsg(`✨ <strong>SPOT ON!</strong> You used "${w}" beautifully! 🌟 Keep going — say "next" when ready!`);
+    speak(`Spot on! You used "${w}" beautifully! Keep going — say next when ready!`);
+    return;
+  }
+  if (/thank|thanks/.test(text)) {
+    addMsg(`You're so welcome! 🥰 Every practice makes you better — keep showing up! 💛`);
+    speak(`You are so welcome! Every practice makes you better — keep showing up!`);
+    return;
+  }
+  if (/bye|goodbye|see you/.test(text)) {
+    addMsg(`See you soon! 👋 Auto-listening stays on — just speak when you're back! 💬`);
+    speak(`See you soon! Auto-listening stays on — just speak when you are back!`);
+    return;
+  }
+  // Default — advance if seems like a response
+  if (sessionStep >= 1 && sessionStep < 7 && text.length > 3) {
+    addMsg(`I heard you loud and clear! ✅ Say "next" to continue!`);
+    speak(`I heard you loud and clear. Say next to continue!`);
   }
 }
 
@@ -373,11 +400,6 @@ document.querySelectorAll('.tab-btn').forEach(b => {
   };
 });
 
-document.getElementById('micBtn').onclick = () => {
-  if (!recognition) return;
-  isListening ? recognition.stop() : recognition.start();
-};
-
 document.getElementById('startSessionBtn').onclick = startFullSession;
 
 document.getElementById('repeatBtn').onclick = () => {
@@ -386,7 +408,7 @@ document.getElementById('repeatBtn').onclick = () => {
     const last = msgs[msgs.length - 1].textContent.replace(/[⏸⏹]/g,',');
     speak(last);
   } else {
-    speak(`Tap Start Full Session and we will practice breathing, pauses, pronunciation, everything together!`);
+    speak(`Tap Start Full Session and we will practice everything together! Remember — auto-listening means just speak, no button needed!`);
   }
 };
 
@@ -404,16 +426,13 @@ PLAN.forEach(d => {
     <div class="flex gap-2 mb-2">
       <button class="text-sm px-3 py-1.5 bg-amber-100 rounded-full" data-speak="${d.word}">🔊 Hear</button>
       <button class="text-sm px-3 py-1.5 bg-amber-100 rounded-full" data-speak="${d.speak}">🔊 Slow</button>
-      <button class="text-sm px-3 py-1.5 bg-blue-100 rounded-full" data-speak-sentence="${d.sentence.replace(/[⏸⏹]/g,', ')}">🔊 Sentence</button>
     </div>
     <p class="text-xs text-slate-400">${d.meaning}</p>
-    <p class="text-xs mt-1 text-slate-500">${d.sentence}</p>
   `;
   lib.appendChild(div);
 });
 lib.onclick = (e) => {
   if (e.target.dataset.speak) speak(e.target.dataset.speak);
-  if (e.target.dataset.speakSentence) speak(e.target.dataset.speakSentence);
 };
 </script>
 </body>
