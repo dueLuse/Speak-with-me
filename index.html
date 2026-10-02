@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Real-time speaking practice — listen, speak, improve" />
+  <title>Speak With Me — Real-Time Practice</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#2563eb',
+            secondary: '#7c3aed',
+            accent: '#f59e0b',
+            success: '#10b981',
+            danger: '#ef4444',
+            light: '#f8fafc',
+            dark: '#1e293b'
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+  <style type="text/tailwindcss">
+    @layer utilities {
+      .content-auto {
+        content-visibility: auto;
+      }
+      .pulse-ring {
+        animation: pulse-ring 1.5s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+      }
+      @keyframes pulse-ring {
+        0% { transform: scale(0.8); opacity: 1; }
+        80%, 100% { transform: scale(1.3); opacity: 0; }
+      }
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen">
+  <header class="bg-white shadow-sm sticky top-0 z-50">
+    <div class="max-w-lg mx-auto px-4 py-3 flex items-center justify-between">
+      <h1 class="text-xl font-bold text-primary flex items-center gap-2">
+        <i class="fa-solid fa-microphone-lines"></i>
+        Speak With Me
+      </h1>
+      <span id="dayBadge" class="bg-secondary/10 text-secondary px-3 py-1 rounded-full text-sm font-medium">Day 1</span>
+    </div>
+  </header>
+
+  <main class="max-w-lg mx-auto px-4 py-4">
+    <!-- Navigation Tabs -->
+    <div class="flex gap-2 mb-5">
+      <button data-tab="talk" class="tab-btn active flex-1 py-2.5 px-3 rounded-lg font-medium transition-all bg-primary text-white">
+        <i class="fa-solid fa-comment mr-1"></i> Talk
+      </button>
+      <button data-tab="plan" class="tab-btn flex-1 py-2.5 px-3 rounded-lg font-medium bg-slate-100 hover:bg-slate-200">
+        <i class="fa-solid fa-list-check mr-1"></i> Plan
+      </button>
+      <button data-tab="words" class="tab-btn flex-1 py-2.5 px-3 rounded-lg font-medium bg-slate-100 hover:bg-slate-200">
+        <i class="fa-solid fa-book mr-1"></i> Words
+      </button>
+    </div>
+
+    <!-- ================================== -->
+    <!-- TALK TAB -->
+    <!-- ================================== -->
+    <section id="talk-panel" class="tab-panel">
+      <div class="bg-white rounded-2xl shadow-sm p-5 mb-4">
+        <h2 class="text-lg font-semibold mb-3">Just Speak & I'll Reply 🎙️</h2>
+        
+        <!-- Chat Area -->
+        <div id="chatBox" class="bg-slate-50 rounded-xl p-4 h-[320px] overflow-y-auto mb-4 border border-slate-100">
+          <div class="bg-amber-50 text-amber-800 rounded-xl p-3 mb-4 text-center">
+            <i class="fa-solid fa-hand-wave mr-2"></i> Hi! Tap the mic below and let's practice!
+          </div>
+        </div>
+
+        <!-- Status -->
+        <p id="status" class="text-center text-slate-500 text-sm mb-3 min-h-[24px]">Ready when you are</p>
+
+        <!-- Microphone Button -->
+        <button id="micBtn" class="relative w-full py-4 rounded-full text-white font-bold text-lg transition-all bg-primary hover:bg-primary/90 active:scale-95">
+          <span id="micIcon" class="mr-2">🎤</span>
+          <span id="micLabel">Tap to Speak</span>
+        </button>
+
+        <!-- Secondary Controls -->
+        <div class="grid grid-cols-2 gap-3 mt-4">
+          <button id="repeatBtn" class="py-3 px-4 rounded-lg bg-slate-100 hover:bg-slate-200 font-medium transition-colors">
+            <i class="fa-solid fa-volume-high mr-1"></i> Repeat
+          </button>
+          <button id="resetChatBtn" class="py-3 px-4 rounded-lg bg-slate-100 hover:bg-slate-200 font-medium transition-colors">
+            <i class="fa-solid fa-broom mr-1"></i> Clear
+          </button>
+        </div>
+      </div>
+
+      <!-- Tips Card -->
+      <div class="bg-white rounded-2xl shadow-sm p-5">
+        <h3 class="font-semibold mb-3"><i class="fa-solid fa-lightbulb text-amber-500 mr-2"></i>Quick Tips</h3>
+        <ul class="space-y-2 text-slate-600 text-sm">
+          <li class="flex items-start gap-2"><i class="fa-solid fa-check text-success mt-0.5"></i> Speak clearly — not too fast</li>
+          <li class="flex items-start gap-2"><i class="fa-solid fa-check text-success mt-0.5"></i> Use today's word in your sentence</li>
+          <li class="flex items-start gap-2"><i class="fa-solid fa-check text-success mt-0.5"></i> If I don't catch it, try again slower</li>
+          <li class="flex items-start gap-2"><i class="fa-solid fa-check text-success mt-0.5"></i> Turn volume up 🔊</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ================================== -->
+    <!-- DAILY PLAN TAB -->
+    <!-- ================================== -->
+    <section id="plan-panel" class="tab-panel hidden">
+      <div class="bg-white rounded-2xl shadow-sm p-5 mb-4">
+        <div class="flex justify-between items-center mb-2">
+          <h2 class="text-lg font-semibold">Your Progress</h2>
+          <span id="weekTag" class="bg-secondary/10 text-secondary px-3 py-1 rounded-full text-sm font-medium">Week 1</span>
+        </div>
+        <p id="dayInfo" class="text-slate-500 text-sm mb-3">Day 1 of 28 — Monday</p>
+        <div class="w-full bg-slate-100 rounded-full h-2.5 mb-6">
+          <div id="progressBar" class="bg-gradient-to-r from-primary to-secondary h-2.5 rounded-full" style="width: 3.57%"></div>
+        </div>
+
+        <!-- Today's Word -->
+        <div class="bg-amber-50 rounded-xl p-4 mb-5">
+          <h3 class="font-semibold text-lg mb-2" id="wordName">articulate</h3>
+          <p class="text-slate-700 mb-3" id="wordPron">ar-<strong class="text-rose-600">TIK</strong>-yuh-layt</p>
+          <div class="flex gap-3 mb-3">
+            <button id="hearWordBtn" class="px-4 py-2 bg-amber-400 text-amber-900 rounded-full font-medium hover:bg-amber-300 transition-colors">
+              🔊 Hear Word
+            </button>
+            <button id="hearSlowBtn" class="px-4 py-2 bg-amber-400 text-amber-900 rounded-full font-medium hover:bg-amber-300 transition-colors">
+              🔊 Slow
+            </button>
+          </div>
+          <p class="text-sm text-slate-600" id="wordMeaning">Express thoughts clearly and effectively</p>
+        </div>
+
+        <!-- Checklist -->
+        <h3 class="font-semibold mb-3">Today's Practice</h3>
+        <div class="space-y-3">
+          <label class="flex items-start gap-3 p-3 rounded-lg bg-slate-50 hover:bg-slate-100 transition-colors cursor-pointer">
+            <input type="checkbox" class="mt-0.5 accent-primary">
+            <span>Warm-up: deep breath → "ahhh" ×3 + pa-pa / ba-ba drills</span>
+          </label>
+          <label class="flex items-start gap-3 p-3 rounded-lg bg-slate-50 hover:bg-slate-100 transition-colors cursor-pointer">
+            <input type="checkbox" class="mt-0.5 accent-primary">
+            <span>Say word slowly → normal speed → in your own sentence</span>
+          </label>
+          <label class="flex items-start gap-3 p-3 rounded-lg bg-slate-50 hover:bg-slate-100 transition-colors cursor-pointer">
+            <input type="checkbox" class="mt-0.5 accent-primary">
+            <span>Talk with me in the <strong>Talk</strong> tab above</span>
+          </label>
+          <label class="flex items-start gap-3 p-3 rounded-lg bg-slate-50 hover:bg-slate-100 transition-colors cursor-pointer">
+            <input type="checkbox" class="mt-0.5 accent-primary">
+            <span>Record yourself → compare → try once more</span>
+          </label>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================================== -->
+    <!-- WORD LIBRARY TAB -->
+    <!-- ================================== -->
+    <section id="words-panel" class="tab-panel hidden">
+      <div class="bg-white rounded-2xl shadow-sm p-5">
+        <h2 class="text-lg font-semibold mb-2">28-Day Word Library</h2>
+        <p class="text-slate-500 text-sm mb-4">Tap 🔊 to hear any word spoken aloud</p>
+        <div id="libraryList" class="space-y-3 max-h-[600px] overflow-y-auto pr-1"></div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ================================== -->
+  <!-- MODAL -->
+  <!-- ================================== -->
+  <div id="modal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 opacity-0 invisible transition-all duration-200">
+    <div class="bg-white rounded-2xl p-6 m-4 max-w-sm w-full text-center scale-95 transition-transform duration-200" id="modalInner">
+      <div class="text-4xl mb-3" id="modalIcon">🎉</div>
+      <h3 class="text-xl font-bold mb-2" id="modalTitle"></h3>
+      <p class="text-slate-600 mb-5" id="modalText"></p>
+      <button id="modalClose" class="w-full py-3 bg-primary text-white rounded-lg font-semibold hover:bg-primary/90 transition-colors">Got it!</button>
+    </div>
+  </div>
+
+  <script>
+    // ==================================================
+    // 28-DAY MASTER PLAN DATA
+    // ==================================================
+    const PLAN = [
+      {day:1, week:1, dayName:'Monday', word:'articulate', pron:'ar-<strong class="text-rose-600">TIK</strong>-yuh-layt', speak:'ar TIK yuh layt', meaning:'Express thoughts clearly and effectively'},
+      {day:2, week:1, dayName:'Tuesday', word:'eloquent', pron:'<strong class="text-rose-600">EL</strong>-o-kwunt', speak:'EL o kwunt', meaning:'Fluent, expressive, and persuasive'},
+      {day:3, week:1, dayName:'Wednesday', word:'concise', pron:'kun-<strong class="text-rose-600">SYS</strong>', speak:'kun SYS', meaning:'Brief but complete — no extra words'},
+      {day:4, week:1, dayName:'Thursday', word:'vivid', pron:'<strong class="text-rose-600">VIV</strong>-id', speak:'VIV id', meaning:'Clear, strong, lively description'},
+      {day:5, week:1, dayName:'Friday', word:'assure', pron:'uh-<strong class="text-rose-600">SHUR</strong>', speak:'uh SHUR', meaning:'Tell confidently; give a promise'},
+      {day:6, week:1, dayName:'Saturday', word:'clarify', pron:'<strong class="text-rose-600">KLAR</strong>-uh-feye', speak:'KLAR uh feye', meaning:'Make something easier to understand'},
+      {day:7, week:1, dayName:'Sunday', word:'confident', pron:'<strong class="text-rose-600">KON</strong>-fuh-dent', speak:'KON fuh dent', meaning:'Self-assured; trust your voice'},
+      {day:8, week:2, dayName:'Monday', word:'articulation', pron:'ar-tik-yuh-<strong class="text-rose-600">LAY</strong>-shun', speak:'ar tik yuh LAY shun', meaning:'How clearly you form every sound'},
+      {day:9, week:2, dayName:'Tuesday', word:'clarity', pron:'<strong class="text-rose-600">KLAR</strong>-uh-tee', speak:'KLAR uh tee', meaning:'How easy your speech is to understand'},
+      {day:10, week:2, dayName:'Wednesday', word:'emphasis', pron:'<strong class="text-rose-600">EM</strong>-fuh-sis', speak:'EM fuh sis', meaning:'Stressing important words'},
+      {day:11, week:2, dayName:'Thursday', word:'enunciate', pron:'ih-<strong class="text-rose-600">NUN</strong>-see-ayt', speak:'ih NUN see ayt', meaning:'Pronounce every part clearly'},
+      {day:12, week:2, dayName:'Friday', word:'fluent', pron:'<strong class="text-rose-600">FLOO</strong>-ent', speak:'FLOO ent', meaning:'Smooth, natural flow without stopping'},
+      {day:13, week:2, dayName:'Saturday', word:'precision', pron:'pri-<strong class="text-rose-600">SIZ</strong>-shun', speak:'pri SIZ shun', meaning:'Exact, careful pronunciation'},
+      {day:14, week:2, dayName:'Sunday', word:'rhythm', pron:'<strong class="text-rose-600">RITH</strong>-um', speak:'RITH um', meaning:'Natural pace and pauses in speech'},
+      {day:15, week:3, dayName:'Monday', word:'authentic', pron:'aw-<strong class="text-rose-600">THEN</strong>-tik', speak:'aw THEN tik', meaning:'True to your natural voice'},
+      {day:16, week:3, dayName:'Tuesday', word:'command', pron:'kuh-<strong class="text-rose-600">MAND</strong>', speak:'kuh MAND', meaning:'Speak with authority and presence'},
+      {day:17, week:3, dayName:'Wednesday', word:'convey', pron:'kun-<strong class="text-rose-600">VEY</strong>', speak:'kun VEY', meaning:'Carry your meaning across clearly'},
+      {day:18, week:3, dayName:'Thursday', word:'emphatic', pron:'em-<strong class="text-rose-600">FAT</strong>-ik', speak:'em FAT ik', meaning:'Speak with force and purpose'},
+      {day:19, week:3, dayName:'Friday', word:'project', pron:'pruh-<strong class="text-rose-600">JEKT</strong>', speak:'pruh JEKT', meaning:'Speak clearly without shouting'},
+      {day:20, week:3, dayName:'Saturday', word:'resonate', pron:'<strong class="text-rose-600">REZ</strong>-uh-nayt', speak:'REZ uh NAYT', meaning:'Warm, full, steady voice'},
+      {day:21, week:3, dayName:'Sunday', word:'sincere', pron:'sin-<strong class="text-rose-600">SEER</strong>', speak:'sin SEER', meaning:'Genuine, honest tone that connects'},
+      {day:22, week:4, dayName:'Monday', word:'accomplish', pron:'uh-<strong class="text-rose-600">KOM</strong>-plish', speak:'uh KOM plish', meaning:'Achieve your speaking goals'},
+      {day:23, week:4, dayName:'Tuesday', word:'expression', pron:'ek-<strong class="text-rose-600">SPRESH</strong>-un', speak:'ek SPRESH un', meaning:'Emotion and meaning in your voice'},
+      {day:24, week:4, dayName:'Wednesday', word:'influence', pron:'<strong class="text-rose-600">IN</strong>-floo-ens', speak:'IN floo ens', meaning:'Your words carry weight and impact'},
+      {day:25, week:4, dayName:'Thursday', word:'confidence', pron:'<strong class="text-rose-600">KON</strong>-fuh-dens', speak:'KON fuh dens', meaning:'Calm assurance in every word'},
+      {day:26, week:4, dayName:'Friday', word:'mastery', pron:'<strong class="text-rose-600">MAS</strong>-tuh-ree', speak:'MAS tuh ree', meaning:'Complete control over your voice'},
+      {day:27, week:4, dayName:'Saturday', word:'progress', pron:'<strong class="text-rose-600">PROG</strong>-res', speak:'PROG res', meaning:'Every day better than the last'},
+      {day:28, week:4, dayName:'Sunday', word:'celebrate', pron:'<strong class="text-rose-600">SEL</strong>-uh-brayt', speak:'SEL uh brayt', meaning:'You did it! 🎉'}
+    ];
+
+    // ==================================================
+    // DAY TRACKING
+    // ==================================================
+    function getDayIndex() {
+      let startDate = localStorage.getItem('sp_startDate');
+      if (!startDate) {
+        startDate = new Date().toDateString();
+        localStorage.setItem('sp_startDate', startDate);
+      }
+      const elapsedMs = new Date() - new Date(startDate);
+      const daysElapsed = Math.floor(elapsedMs / (1000 * 60 * 60 * 24));
+      return Math.min(daysElapsed, 27);
+    }
+    const TODAY = PLAN[getDayIndex()];
+
+    // ==================================================
+    // TEXT-TO-SPEECH ENGINE
+    // ==================================================
+    function speak(text, onEnd) {
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'en-US';
+      utterance.rate = 0.8;
+      utterance.pitch = 1;
+      utterance.onend = onEnd;
+      window.speechSynthesis.speak(utterance);
+    }
+
+    // ==================================================
+    // SPEECH RECOGNITION (LISTEN TO USER)
+    // ==================================================
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    let recognition = null;
+    let isListening = false;
+
+    if (SpeechRecognition) {
+      recognition = new SpeechRecognition();
+      recognition.lang = 'en-US';
+      recognition.interimResults = true;
+      recognition.continuous = false;
+
+      recognition.onstart = () => {
+        isListening = true;
+        updateMicUI(true);
+        setStatus("🎙️ Listening — speak now!");
+      };
+
+      recognition.onresult = (event) => {
+        const transcript = Array.from(event.results)
+          .map(r => r[0].transcript)
+          .join('');
+        if (event.results[0].isFinal) {
+          appendMessage(transcript, 'user');
+          generateReply(transcript);
+        }
+      };
+
+      recognition.onend = () => {
+        isListening = false;
+        updateMicUI(false);
+        setStatus("Ready — tap to speak 🎤");
+      };
+
+      recognition.onerror = (event) => {
+        isListening = false;
+        updateMicUI(false);
+        if (event.error === 'not-allowed') {
+          setStatus("⚠️ Microphone blocked — allow access in site settings");
+        } else {
+          setStatus("Try again — speak clearly please");
+        }
+      };
+    } else {
+      setStatus("❌ Not supported — use Chrome or Safari");
+      document.getElementById('micBtn').classList.add('opacity-50', 'cursor-not-allowed');
+    }
+
+    // ==================================================
+    // CHAT UI HELPERS
+    // ==================================================
+    function appendMessage(text, sender) {
+      const container = document.getElementById('chatBox');
+      const bubble = document.createElement('div');
+      bubble.className = `mb-3 max-w-[85%] p-3 rounded-xl ${
+        sender === 'user' 
+          ? 'bg-primary text-white ml-auto rounded-br-sm' 
+          : 'bg-slate-100 text-slate-800 mr-auto rounded-bl-sm'
+      }`;
+      bubble.textContent = text;
+      container.appendChild(bubble);
+      container.scrollTop = container.scrollHeight;
+    }
+
+    function setStatus(text) {
+      document.getElementById('status').textContent = text;
+    }
+
+    function updateMicUI(listening) {
+      const btn = document.getElementById('micBtn');
+      const icon = document.getElementById('micIcon');
+      const label = document.getElementById('micLabel');
+      
+      if (listening) {
+        btn.classList.add('bg-danger', 'animate-pulse');
+        btn.classList.remove('bg-primary');
+        icon.textContent = '🔴';
+        label.textContent = 'Listening...';
+      } else {
+        btn.classList.remove('bg-danger', 'animate-pulse');
+        btn.classList.add('bg-primary');
+        icon.textContent = '🎤';
+        label.textContent = 'Tap to Speak';
+      }
+    }
+
+    // ==================================================
+    // SMART RESPONSE GENERATOR
+    // ==================================================
+    function generateReply(userText) {
+      const text = userText.toLowerCase().trim();
+      const word = TODAY.word;
+      const usedWord = text.includes(word.toLowerCase());
+      let reply = '';
+
+      if (/^(hi|hello|hey|good morning|good afternoon|good evening)/.test(text)) {
+        reply = `Hi there! 😊 Great to connect. Today's word is **${word}** — can you say it for me?`;
+      } else if (/what.*mean|meaning|define|definition/.test(text)) {
+        reply = `**${word}** means: ${TODAY.meaning}. Try saying it like this: "${TODAY.speak}" — you've got this! 💪`;
+      } else if (usedWord) {
+        reply = `✨ **PERFECTION!** You used "${word}" exactly right! 🌟 That was clear and confident. Make one more sentence with it — I'm all ears! 💯`;
+      } else if (/how are you/.test(text)) {
+        reply = `I'm doing wonderful, thanks for asking! 😄 I'm so proud you're here practicing. How are YOU feeling today?`;
+      } else if (/i am|i'm.*good|fine|great|okay|doing well/.test(text)) {
+        reply = `That makes me so happy to hear! 💛 Let's keep going — say "${word}" nice and slow for me now?`;
+      } else if (/thank|thanks/.test(text)) {
+        reply = `You are so welcome! 🥰 Keep showing up like this — you're amazing and you WILL improve! 💪✨`;
+      } else if (/bye|goodbye|see you|gotta go|see ya/.test(text)) {
+        reply = `See you soon! 👋 Fantastic practice today. Come back same time? You've got this! 🎤💛`;
+      } else if (text.length < 4) {
+        reply = `I didn't quite catch that — try again a little slower? 🎤 I'm right here!`;
+      } else {
+        reply = `I heard you! 👂 Now — can you use **${word}** in a sentence about that? I bet you can! 💫`;
+      }
+
+      setTimeout(() => {
+        appendMessage(reply, 'assistant');
+        speak(reply);
+      }, 500);
+    }
+
+    // ==================================================
+    // UI INITIALIZATION
+    // ==================================================
+    // Tab switching
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab-btn').forEach(b => {
+          b.classList.remove('active', 'bg-primary', 'text-white');
+          b.classList.add('bg-slate-100', 'hover:bg-slate-200');
+        });
+        btn.classList.add('active', 'bg-primary', 'text-white');
+        btn.classList.remove('bg-slate-100');
+        
+        const targetTab = btn.dataset.tab;
+        document.querySelectorAll('.tab-panel').forEach(panel => {
+          panel.classList.add('hidden');
+        });
+        document.getElementById(`${targetTab}-panel`).classList.remove('hidden');
+      });
+    });
+
+    // Mic button
+    document.getElementById('micBtn').addEventListener('click', () => {
+      if (!recognition) return;
+      if (isListening) recognition.stop();
+      else recognition.start();
+    });
+
+    // Repeat last message
+    document.getElementById('repeatBtn').addEventListener('click', () => {
+      const bubbles = document.querySelectorAll('#chatBox > div');
+      if (bubbles.length > 1) {
+        const lastAssistant = Array.from(bubbles).reverse().find(b => !b.classList.contains('bg-amber-50') && !b.classList.contains('ml-auto'));
+        if (lastAssistant) speak(lastAssistant.textContent);
+      } else {
+        speak(`Hi! Today's word is ${TODAY.word}. Let's practice together!`);
+      }
+    });
+
+    // Clear chat
+    document.getElementById('resetChatBtn').addEventListener('click', () => {
+      document.getElementById('chatBox').innerHTML = `
+        <div class="bg-amber-50 text-amber-800 rounded-xl p-3 mb-4 text-center">
+          <i class="fa-solid fa-wand-magic-sparkles mr-2"></i> Fresh start! Let's go!
+        </div>
+      `;
+    });
+
+    // Build daily plan
+    document.getElementById('dayBadge').textContent = `Day ${TODAY.day}`;
+    document.getElementById('weekTag').textContent = `Week ${TODAY.week}`;
+    document.getElementById('dayInfo').textContent = `Day ${TODAY.day} of 28 — ${TODAY.dayName}`;
+    document.getElementById('progressBar').style.width = `${(TODAY.day / 28) * 100}%`;
+    document.getElementById('wordName').textContent = TODAY.word;
+    document.getElementById('wordPron').innerHTML = TODAY.pron;
+    document.getElementById('wordMeaning').textContent = TODAY.meaning;
+    document.getElementById('hearWordBtn').addEventListener('click', () => speak(TODAY.word));
+    document.getElementById('hearSlowBtn').addEventListener('click', () => speak(TODAY.speak));
+
+    // Build word library
+    const libraryList = document.getElementById('libraryList');
+    PLAN.forEach(entry => {
+      const item = document.createElement('div');
+      item.className = 'p-3 bg-slate-50 rounded-lg';
+      item.innerHTML = `
+        <p class="font-medium">Day ${entry.day}: ${entry.word}</p>
+        <p class="text-sm text-slate-500 mb-2">${entry.pron}</p>
+        <div class="flex gap-2">
+          <button class="text-sm px-3 py-1.5 bg-amber-400/20 text-amber-700 rounded-full hover:bg-amber-400/30 transition-colors" data-speak="${entry.word}">🔊 Hear</button>
+          <button class="text-sm px-3 py-1.5 bg-amber-400/20 text-amber-700 rounded-full hover:bg-amber-400/30 transition-colors" data-speak="${entry.speak}">🔊 Slow</button>
+        </div>
+        <p class="text-xs text-slate-400 mt-2">${entry.meaning}</p>
+      `;
+      libraryList.appendChild(item);
+    });
+    libraryList.addEventListener('click', (e) => {
+      if (e.target.dataset.speak) speak(e.target.dataset.speak);
+    });
+
+    // Modal
+    const modal = document.getElementById('modal');
+    document.getElementById('modalClose').addEventListener('click', () => {
+      modal.classList.remove('opacity-100', 'visible');
+      document.getElementById('modalInner').classList.remove('scale-100');
+    });
+
+    // Welcome message
+    setTimeout(() => {
+      speak(`Hello! I'm your speaking practice partner. Today is ${TODAY.dayName}. Your word is ${TODAY.word}. Tap the microphone and say hello!`);
+    }, 1000);
+  </script>
+</body>
+</html>
